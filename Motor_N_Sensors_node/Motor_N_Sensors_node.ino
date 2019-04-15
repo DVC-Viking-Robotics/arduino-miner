@@ -79,6 +79,10 @@ void setup(){
                       "if the board jumpers are.");
         while (1); // infinite while loop to stop program if sensor not found
     }
+    // calibrate the 9DoF sensors. Stores bias if arg == true
+    imu.calibrate(true);// calibrates Accel & gyro
+    imu.calibrateMag(true);// calibrates magnetometer
+
     // initialize the 6DoF chip & self-calibrate
     Wire.begin();
     mpu6050.begin();
