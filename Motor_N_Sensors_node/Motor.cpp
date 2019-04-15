@@ -2,12 +2,10 @@
 #include <arduino.h>
 
 // Function definitions for BiMotor class
-BiMotor::BiMotor(unsigned char pin1, unsigned char pin2){
+BiMotor::BiMotor(unsigned char pin1, unsigned char pin2): Motor(pin1, pin2){
     // save pin #s and set pin mode
     pOut1 = pin1;
     pOut2 = pin2;
-    pinMode(pin2, OUTPUT);
-    pinMode(pin1, OUTPUT);
     // initialize PWM duty cycles
     p1 = 0;
     p2 = 0;
@@ -35,8 +33,6 @@ PhasedMotor::PhasedMotor(unsigned char pin1, unsigned char pin2){
     // save pin #s and set pin mode
     dirPin = pin1;
     pwmPin = pin2;
-    pinMode(pin2, OUTPUT);
-    pinMode(pin1, OUTPUT);
     // initialize PWM duty cycles
     dir = false;
     pwm = 0;

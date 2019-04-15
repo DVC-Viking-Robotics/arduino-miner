@@ -1,8 +1,13 @@
 #ifndef Motor_h
 #define Motor_h
+#include <arduino.h>
 
 class Motor{
 public:
+    Motor(unsigned char pin1, unsigned char pin2){
+        pinMode(pin1, OUTPUT);
+        pinMode(pin2, OUTPUT);
+    }
     void setSpeed(short){};
 };
 
