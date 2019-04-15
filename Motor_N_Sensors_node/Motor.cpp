@@ -29,7 +29,7 @@ void BiMotor::write(){
 }
 
 // Function definitions for PhasedMotor class
-PhasedMotor::PhasedMotor(unsigned char pin1, unsigned char pin2){
+PhasedMotor::PhasedMotor(unsigned char pin1, unsigned char pin2): Motor(pin1, pin2){
     // save pin #s and set pin mode
     dirPin = pin1;
     pwmPin = pin2;
