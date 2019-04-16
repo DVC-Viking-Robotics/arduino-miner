@@ -3,12 +3,14 @@
 #include <LSM9DS1_Types.h>
 #include <SparkFunLSM9DS1.h>
 // include libraries for 6DoF sensor
-#include <MPU6050_tockn.h>
-#include <Wire.h>
+// #include <MPU6050_tockn.h>
+// #include <Wire.h>
+
 // include library for GPS sensor
 #include <SparkFun_Ublox_Arduino_Library.h>
 // include library for ultrasonic distance sensors
 #include <NewPing.h>
+/* 
 // include library for stepper motors
 #include <Stepper.h>
 
@@ -23,6 +25,7 @@
 #define M1Backward 	9
 #define M2Forward 	10
 #define M2Backward 	11
+ */
 // define HC-SR04 pins (echo and trigger are connected to same pin) for NewPing library
 #define sensor1     13
 #define sensor2     12
@@ -30,15 +33,16 @@
 #define sensor4     7
 // define max sensor distance for HC-SR04 (in centimeters)
 #define max_distance 400
+/* 
 // define controls pins for stepper motor
 unsigned char sPins[4] = {2, 3, 4, 5};
 // change this to fit the number of steps per revolution for your stepper motor
 const int stepsPerRevolution = 200;
-
 // declare drivetrain
 Drivetrain* d;
 // declare & initialize stepper motor
 Stepper neck(stepsPerRevolution, sPins[0], sPins[1], sPins[2], sPins[3]);
+ */
 // declare size of/& array for HCSR04 using NewPing library
 const unsigned char totalDistSensors = 4;
 NewPing sonar[totalDistSensors] = {
@@ -53,14 +57,16 @@ NewPing sonar[totalDistSensors] = {
 // declare 9DoF chip
 LSM9DS1 imu;
 // declare 6DoF chip
-MPU6050 mpu6050(Wire);
+// MPU6050 mpu6050(Wire);
 
 void setup(){
 	Serial.begin(115200);// open a channel to pour data into & get commands
+    /* 
     // instantiate drivetrain object (motors' speeds default to 0)
     if (motorConfig)
         d = new QuadPed(M1Forward, M1Backward, M2Forward, M2Backward, phased);
     else d = new BiPed(M1Forward, M1Backward, M2Forward, M2Backward, phased);
+     */
     // Before initializing the IMU, there are a few settings
     // we may need to adjust. Use the settings struct to set
     // the device's communication mode and addresses:
@@ -82,11 +88,12 @@ void setup(){
     // calibrate the 9DoF sensors. Stores bias if arg == true
     imu.calibrate(true);// calibrates Accel & gyro
     imu.calibrateMag(true);// calibrates magnetometer
-
+/* 
     // initialize the 6DoF chip & self-calibrate
     Wire.begin();
     mpu6050.begin();
     mpu6050.calcGyroOffsets(true);// robot should be still during boot up
+     */
 }
 
 void loop(){
@@ -120,7 +127,7 @@ void loop(){
     Serial.print(",");Serial.print(imu.mx);
     Serial.print(",");Serial.print(imu.my);
     Serial.print(",");Serial.println(imu.mz);
-
+/* 
     // get & print 6DoF sensor data
     Serial.print("6DoF");Serial.print(mpu6050.getAccX());
     Serial.print(",");Serial.print(mpu6050.getAccY());
@@ -128,7 +135,7 @@ void loop(){
     Serial.print(",");Serial.print(mpu6050.getGyroX());
     Serial.print(",");Serial.print(mpu6050.getGyroY());
     Serial.print(",");Serial.println(mpu6050.getGyroZ());
-    
+ */    
     
     // get & print distance sensor data
     Serial.print("Dist");
@@ -137,12 +144,13 @@ void loop(){
         Serial.print(sonar[i].ping_cm());
     }
     Serial.println("");
+/* 
     // get and print drive motor speed (PWM: 0-255)
     Serial.print("Driv,");
     Serial.print(d->getSpeed(0));
     Serial.print(",");
     Serial.println(d->getSpeed(1));
-
+    
     while (Serial.available() > 2){ //read from buffer if more than 2 bytes
 	    // LF & CR (2 bytes) seem to linger in stream buffer for 1 extra loop() iteration
 	    // stream expected format  = "# #" where # == [-100,100]
@@ -153,5 +161,6 @@ void loop(){
         short y = Serial.parseInt();
         d->go(x, y);
 	}
+     */
     delayMicroseconds(60);
 }
