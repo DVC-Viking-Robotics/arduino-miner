@@ -2,20 +2,18 @@
 #include <LSM9DS1_Registers.h>
 #include <LSM9DS1_Types.h>
 #include <SparkFunLSM9DS1.h>
-// include libraries for 6DoF sensor
-// #include <MPU6050_tockn.h>
-// #include <Wire.h>
+// need to find optimized library for the MPU6050; library by _tockn is a memory hog
 
 // include library for GPS sensor
 #include <SparkFun_Ublox_Arduino_Library.h>
 // include library for ultrasonic distance sensors
 #include <NewPing.h>
-/* 
+
 // include library for stepper motors
 #include <Stepper.h>
 
 // define motor type: 1 to enable direction + PWM or 0 to enable 2 PWM
-#define phased 1
+#define phased 0
 // define drivetrain type: 0 to enable BiPed (R2D2-like), 1 to enable QuadPed (like a race car)
 #define motorConfig 0
 #include "Drivetrain.h"
@@ -25,7 +23,7 @@
 #define M1Backward 	9
 #define M2Forward 	10
 #define M2Backward 	11
- */
+
 // define HC-SR04 pins (echo and trigger are connected to same pin) for NewPing library
 #define sensor1     13
 #define sensor2     12
@@ -33,7 +31,7 @@
 #define sensor4     7
 // define max sensor distance for HC-SR04 (in centimeters)
 #define max_distance 400
-/* 
+
 // define controls pins for stepper motor
 unsigned char sPins[4] = {2, 3, 4, 5};
 // change this to fit the number of steps per revolution for your stepper motor
@@ -42,7 +40,7 @@ const int stepsPerRevolution = 200;
 Drivetrain* d;
 // declare & initialize stepper motor
 Stepper neck(stepsPerRevolution, sPins[0], sPins[1], sPins[2], sPins[3]);
- */
+
 // declare size of/& array for HCSR04 using NewPing library
 const unsigned char totalDistSensors = 4;
 NewPing sonar[totalDistSensors] = {
@@ -52,8 +50,8 @@ NewPing sonar[totalDistSensors] = {
     NewPing(sensor4, sensor4, max_distance)};
 
 // SDO_XM and SDO_G are both pulled high, so our addresses are:
-#define LSM9DS1_M	0x1E // Would be 0x1C if SDO_M is LOW
-#define LSM9DS1_AG	0x6B // Would be 0x6A if SDO_AG is LOW
+#define LSM9DS1_M	0x1C // Would be 0x1E if SDO_M is LOW
+#define LSM9DS1_AG	0x6A // Would be 0x6B if SDO_AG is LOW
 // declare 9DoF chip
 LSM9DS1 imu;
 // declare 6DoF chip
@@ -61,12 +59,12 @@ LSM9DS1 imu;
 
 void setup(){
 	Serial.begin(115200);// open a channel to pour data into & get commands
-    /* 
+    
     // instantiate drivetrain object (motors' speeds default to 0)
     if (motorConfig)
         d = new QuadPed(M1Forward, M1Backward, M2Forward, M2Backward, phased);
     else d = new BiPed(M1Forward, M1Backward, M2Forward, M2Backward, phased);
-     */
+    
     // Before initializing the IMU, there are a few settings
     // we may need to adjust. Use the settings struct to set
     // the device's communication mode and addresses:
@@ -88,12 +86,6 @@ void setup(){
     // calibrate the 9DoF sensors. Stores bias if arg == true
     imu.calibrate(true);// calibrates Accel & gyro
     imu.calibrateMag(true);// calibrates magnetometer
-/* 
-    // initialize the 6DoF chip & self-calibrate
-    Wire.begin();
-    mpu6050.begin();
-    mpu6050.calcGyroOffsets(true);// robot should be still during boot up
-     */
 }
 
 void loop(){
@@ -135,8 +127,8 @@ void loop(){
     Serial.print(",");Serial.print(mpu6050.getGyroX());
     Serial.print(",");Serial.print(mpu6050.getGyroY());
     Serial.print(",");Serial.println(mpu6050.getGyroZ());
- */    
     
+ */    
     // get & print distance sensor data
     Serial.print("Dist");
     for (unsigned char i = 0; i < totalDistSensors; i++){
@@ -144,23 +136,27 @@ void loop(){
         Serial.print(sonar[i].ping_cm());
     }
     Serial.println("");
-/* 
+
     // get and print drive motor speed (PWM: 0-255)
     Serial.print("Driv,");
     Serial.print(d->getSpeed(0));
     Serial.print(",");
     Serial.println(d->getSpeed(1));
     
-    while (Serial.available() > 2){ //read from buffer if more than 2 bytes
+    if (Serial.available() > 2){ //read from buffer if more than 2 bytes
 	    // LF & CR (2 bytes) seem to linger in stream buffer for 1 extra loop() iteration
-	    // stream expected format  = "# #" where # == [-100,100]
+	    // stream expected format  = "# #" where # == [-255,255]
 	    // delimiter can be any non-digit character (example above uses ' ')
 	    // use x for left-right steering
         // use y for forward-backward drive
         short x = Serial.parseInt();
         short y = Serial.parseInt();
+        // Serial.print("received ");
+        // Serial.print(x);
+        // Serial.print(" ");
+        // Serial.println(y);
         d->go(x, y);
 	}
-     */
+    
     delayMicroseconds(60);
 }

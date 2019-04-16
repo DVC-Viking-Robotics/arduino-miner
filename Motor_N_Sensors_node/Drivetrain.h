@@ -15,8 +15,8 @@ public:
             M2 = new BiMotor(m2pin1, m2pin2);
         }
     }
-    void go(short, short){};
-    short getSpeed(unsigned char){};
+    virtual void go(short, short){};
+    virtual short getSpeed(unsigned char){};
 protected:
     short clampPWM(short input){ // return a proper range of [-255, 255]
         return (input < -255 ? -255: (input > 255 ? 255 : input));
@@ -32,7 +32,6 @@ public:
     void go(short, short);// set motors' speeds allowable range is [-255,255]
     short getSpeed(unsigned char); //return PWM duty cycle in range [-255, 255]
 private:
-    short clampPWM(short);// return a proper range of [-255, 255]
     // motor objects and current speeds for left and right motors
     short right, left;
 };
@@ -44,7 +43,6 @@ public:
     void go(short, short);// set motors' speeds allowable range is [-255,255]
     short getSpeed(unsigned char m = 0); //return PWM duty cycle in range [-255, 255]
 private:
-    short clampPWM(short);// return a proper range of [-255, 255]
     // motor objects and current speeds for left and right motors
     short FB, LR;
 };

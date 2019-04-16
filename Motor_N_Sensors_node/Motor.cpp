@@ -10,7 +10,7 @@ BiMotor::BiMotor(unsigned char pin1, unsigned char pin2): Motor(pin1, pin2){
     p1 = 0;
     p2 = 0;
 }
-void BiMotor::setSpeed(int s){
+void BiMotor::setSpeed(short s){
     //input speed 's' must be previously constrained to range of [-255, 255]
     if (s < 0){ // if going backward
         p1 = 0;
@@ -37,7 +37,7 @@ PhasedMotor::PhasedMotor(unsigned char pin1, unsigned char pin2): Motor(pin1, pi
     dir = false;
     pwm = 0;
 }
-void PhasedMotor::setSpeed(int s){
+void PhasedMotor::setSpeed(short s){
     //input speed 's' must be previously constrained to range of [-255, 255]
     if (s <= 0){     // if going backward or stopped
         dir = false;
