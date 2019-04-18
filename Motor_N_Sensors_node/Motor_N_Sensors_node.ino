@@ -54,6 +54,8 @@ NewPing sonar[totalDistSensors] = {
 #define LSM9DS1_AG	0x6A // Would be 0x6B if SDO_AG is LOW
 // declare 9DoF chip
 LSM9DS1 imu;
+
+#define DECLINATION -13.44
 // declare 6DoF chip
 // MPU6050 mpu6050(Wire);
 
@@ -119,6 +121,9 @@ void loop(){
     Serial.print(",");Serial.print(imu.mx);
     Serial.print(",");Serial.print(imu.my);
     Serial.print(",");Serial.println(imu.mz);
+
+    printAttitude(imu.mx, imu.my, imu.mz);
+    Serial.println();
 /* 
     // get & print 6DoF sensor data
     Serial.print("6DoF");Serial.print(mpu6050.getAccX());
@@ -151,12 +156,35 @@ void loop(){
         // use y for forward-backward drive
         short x = Serial.parseInt();
         short y = Serial.parseInt();
-        // Serial.print("received ");
-        // Serial.print(x);
-        // Serial.print(" ");
-        // Serial.println(y);
         d->go(x, y);
 	}
     
     delayMicroseconds(60);
+}
+
+
+void printAttitude(float mx, float my, float mz){
+    float heading;
+    if (mx == 0)
+        heading = my < 0 ? PI / 2 : 0;
+    else heading = atan2(my, mx);
+
+    if (heading > (2 * PI)) heading -= (2 * PI);
+    else if (heading < 0) heading += (2 * PI);
+
+    // Convert everything from radians to degrees:
+    heading *= 180.0 / PI;
+    // heading += DECLINATION;
+
+    Serial.print("Heading: "); Serial.println(heading, 2);
+/*   
+    If heading is greater than 337.25 degrees or less than 22.5 degrees – North
+    If heading is between 292.5 degrees and 337.25 degrees – North-West
+    If heading is between 247.5 degrees and 292.5 degrees – West
+    If heading is between 202.5 degrees and 247.5 degrees – South-West
+    If heading is between 157.5 degrees and 202.5 degrees – South
+    If heading is between 112.5 degrees and 157.5 degrees – South-East
+    If heading is between 67.5 degrees and 112.5 degrees – East
+    If heading is between 0 degrees and 67.5 degrees – North-East
+ */
 }
