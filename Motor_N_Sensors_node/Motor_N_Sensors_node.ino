@@ -49,13 +49,13 @@ NewPing sonar[totalDistSensors] = {
     NewPing(sensor3, sensor3, max_distance),
     NewPing(sensor4, sensor4, max_distance)};
 
-// SDO_XM and SDO_G are both pulled high, so our addresses are:
-#define LSM9DS1_M	0x1C // Would be 0x1E if SDO_M is LOW
-#define LSM9DS1_AG	0x6A // Would be 0x6B if SDO_AG is LOW
+// SDO_M and SDO_AG are both pulled LOW, so our addresses are:
+#define LSM9DS1_M	0x1C // Would be 0x1E if SDO_M is FLOATING
+#define LSM9DS1_AG	0x6A // Would be 0x6B if SDO_AG is FLOATING
 // declare 9DoF chip
 LSM9DS1 imu;
-
 #define DECLINATION -13.44
+
 // declare 6DoF chip
 // MPU6050 mpu6050(Wire);
 
@@ -77,12 +77,7 @@ void setup(){
     // imu.begin(), which verifies communication with the IMU
     // and turns it on.
     if (!imu.begin()){
-        Serial.println("Failed to communicate with LSM9DS1.");
-        Serial.println("Double-check wiring.");
-        Serial.println("Default settings in this sketch will " \
-                      "work for an out of the box LSM9DS1 " \
-                      "Breakout, but may need to be modified " \
-                      "if the board jumpers are.");
+        Serial.println("Failed to communicate with LSM9DS1. Double-check wiring.");
         while (1); // infinite while loop to stop program if sensor not found
     }
     // calibrate the 9DoF sensors. Stores bias if arg == true
@@ -163,8 +158,8 @@ void loop(){
 }
 
 
-void printAttitude(float mx, float my, float mz){
-    float heading;
+void printAttitude(short mx, short my, short mz){
+    double heading;
     if (mx == 0)
         heading = my < 0 ? PI / 2 : 0;
     else heading = atan2(my, mx);
@@ -173,7 +168,7 @@ void printAttitude(float mx, float my, float mz){
     else if (heading < 0) heading += (2 * PI);
 
     // Convert everything from radians to degrees:
-    heading *= 180.0 / PI;
+    heading *= 180 / PI;
     // heading += DECLINATION;
 
     Serial.print("Heading: "); Serial.println(heading, 2);
