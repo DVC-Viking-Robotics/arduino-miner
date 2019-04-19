@@ -170,8 +170,8 @@ void loop(){
 }
 
 void calcPitchYaw(short ax, short ay, short az, short gx, short gy, short gz, long dt){
-    //the next two lines calculate the orientation of the accelerometer relative to the earth and convert the output of atan2 from radians to degrees
-    //We will use this data to correct any cumulative errors in the orientation that the gyroscope develops.
+    // calculate the orientation of the accelerometer and convert the output of atan2 from radians to degrees
+    // this data is used to correct any cumulative errors in the orientation that the gyroscope develops.
     double rollangle=atan2(ay,az)*180/PI;
     double pitchangle=atan2(ax,sqrt(ay*ay+az*az))*180/PI;
 
@@ -198,12 +198,13 @@ void printAttitude(short mx, short my, short mz){
         heading = my < 0 ? PI / 2 : 0;
     else heading = atan2(my, mx);
 
-    if (heading > (2 * PI)) heading -= (2 * PI);
-    else if (heading < 0) heading += (2 * PI);
-
     // Convert everything from radians to degrees:
     heading *= 180 / PI;
-    // heading += DECLINATION;
+    heading -= DECLINATION;
+
+    // ensure proper range of [0, 360]
+    if (heading > 360) heading -= 360;
+    else if (heading < 0) heading += 360;
 
     Serial.print("Heading: "); Serial.println(heading, 2);
 /*   
