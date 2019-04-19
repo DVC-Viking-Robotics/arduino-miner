@@ -55,9 +55,15 @@ NewPing sonar[totalDistSensors] = {
 // declare 9DoF chip
 LSM9DS1 imu;
 #define DECLINATION -13.44
+long timer; // a timer to save delta timer for each loop.
+double roll, pitch ,yaw; //These are the angles in the complementary filter
 
 // declare 6DoF chip
 // MPU6050 mpu6050(Wire);
+
+// declare gps object
+SFE_UBLOX_GPS myGPS;
+
 
 void setup(){
 	Serial.begin(115200);// open a channel to pour data into & get commands
@@ -83,6 +89,8 @@ void setup(){
     // calibrate the 9DoF sensors. Stores bias if arg == true
     imu.calibrate(true);// calibrates Accel & gyro
     imu.calibrateMag(true);// calibrates magnetometer
+    //start a timer
+    timer = micros();
 }
 
 void loop(){
@@ -135,7 +143,9 @@ void loop(){
         Serial.print(",");
         Serial.print(sonar[i].ping_cm());
     }
-    Serial.println("");
+    Serial.println();
+    // ensure samples validity by waiting 60ms between readings
+    delayMicroseconds(60);
 
     // get and print drive motor speed (PWM: 0-255)
     Serial.print("Driv,");
@@ -154,9 +164,33 @@ void loop(){
         d->go(x, y);
 	}
     
-    delayMicroseconds(60);
+    // notice calculation is passed as delta timer ('dt') in microseconds
+    calcPitchYaw(imu.ax, imu.ay, imu.az,imu.gx, imu.gy, imu.gz, micros() - timer);
+    timer = micros(); // reset timer
 }
 
+void calcPitchYaw(short ax, short ay, short az, short gx, short gy, short gz, long dt){
+    //the next two lines calculate the orientation of the accelerometer relative to the earth and convert the output of atan2 from radians to degrees
+    //We will use this data to correct any cumulative errors in the orientation that the gyroscope develops.
+    double rollangle=atan2(ay,az)*180/PI;
+    double pitchangle=atan2(ax,sqrt(ay*ay+az*az))*180/PI;
+
+    //THE COMPLEMENTARY FILTER
+    //This filter calculates the angle based MOSTLY on integrating the angular velocity to an angular displacement.
+    //dt is the time between loop() iterations. 
+    //We'll pretend that the angular velocity has remained constant over the time dt, and multiply angular velocity by time to get displacement.
+    //The filter then adds a small correcting factor from the accelerometer ("roll" or "pitch"), so the gyroscope knows which way is down.
+    roll = 0.99 * (roll + gx * (dt / 1000000.0)) + 0.01 * rollangle; // Calculate the angle using a Complimentary filter
+    pitch = 0.99 * (pitch + gy * (dt / 1000000.0)) + 0.01 * pitchangle;
+    yaw=gz;
+
+    Serial.print("roll = ");
+    Serial.print(roll);
+    Serial.print("\t\tpitch = ");
+    Serial.print(pitch);
+    Serial.print("\t\tyaw = ");
+    Serial.println(yaw);
+}
 
 void printAttitude(short mx, short my, short mz){
     double heading;
@@ -183,3 +217,4 @@ void printAttitude(short mx, short my, short mz){
     If heading is between 0 degrees and 67.5 degrees – North-East
  */
 }
+
