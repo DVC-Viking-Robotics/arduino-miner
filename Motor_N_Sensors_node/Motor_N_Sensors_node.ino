@@ -146,6 +146,10 @@ void parseInput(){
         x = Serial.parseInt();
         y = Serial.parseInt();
         d->go(x, y);
+        Serial.print("received args: ");
+        Serial.print(x);
+        Serial.print(",");
+        Serial.println(y);
         getDriveData();
     }
     else if (cmd == "Dist"){
