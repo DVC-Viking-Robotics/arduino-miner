@@ -41,7 +41,7 @@ unsigned char sPins[4] = {2, 3, 4, 5};
 const int stepsPerRevolution = 200;
 // declare drivetrain
 Drivetrain* d;
-short rpm = 1; // rpms are based on <= stepper motor's rated max RPM
+short rpm = 60; // rpms are based on <= stepper motor's rated max RPM
 // declare & initialize stepper motor
 Stepper neck(stepsPerRevolution, sPins[0], sPins[1], sPins[2], sPins[3]);
 
