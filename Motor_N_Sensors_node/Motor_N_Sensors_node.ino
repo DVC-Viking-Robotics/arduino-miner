@@ -99,29 +99,6 @@ void setup(){
 }
 
 void loop(){
-    // Update the sensor values whenever new data is available
-    if ( imu.gyroAvailable() ){
-        // To read from the gyroscope,  first call the
-        // readGyro() function. When it exits, it'll update the
-        // gx, gy, and gz variables with the most current data.
-        imu.readGyro();
-    }
-    if ( imu.accelAvailable() ){
-        // To read from the accelerometer, first call the
-        // readAccel() function. When it exits, it'll update the
-        // ax, ay, and az variables with the most current data.
-        imu.readAccel();
-    }
-    if ( imu.magAvailable() ){
-        // To read from the magnetometer, first call the
-        // readMag() function. When it exits, it'll update the
-        // mx, my, and mz variables with the most current data.
-        imu.readMag();
-    }
-    // notice calculation is passed as delta timer ('dt') in microseconds
-    dt = micros() - timer;
-    timer = micros(); // reset timer
-    
     while (Serial.available()){ //read from buffer if more than 2 bytes
 	    // LF & CR (2 bytes) seem to linger in stream buffer for 1 extra loop() iteration
 	    parseInput();
@@ -192,7 +169,31 @@ void getDriveData(){
     Serial.println(d->getSpeed(1));
 }
 
+void readIMU(){
+    timer = micros(); // reset timer
+    if ( imu.gyroAvailable() ){
+        // To read from the gyroscope,  first call the
+        // readGyro() function. When it exits, it'll update the
+        // gx, gy, and gz variables with the most current data.
+        imu.readGyro();
+    }
+    if ( imu.accelAvailable() ){
+        // To read from the accelerometer, first call the
+        // readAccel() function. When it exits, it'll update the
+        // ax, ay, and az variables with the most current data.
+        imu.readAccel();
+    }
+    if ( imu.magAvailable() ){
+        // To read from the magnetometer, first call the
+        // readMag() function. When it exits, it'll update the
+        // mx, my, and mz variables with the most current data.
+        imu.readMag();
+    }
+    dt = micros() - timer;
+    timer = micros(); // reset timer
+}
 void getIMUdata(){
+    readIMU();
 /* 
     // get & print 6DoF sensor data
     Serial.print("6DoF");Serial.print(mpu6050.getAccX());
