@@ -162,7 +162,6 @@ void parseInput(){
         getIMUdata();
     }
     else if (cmd == "HYPR"){
-        calcPitchYaw();
         getHYPR();
     }
 }
@@ -200,29 +199,6 @@ void getDistanceData(){
     delayMicroseconds(60);
 }
 
-void calcPitchYaw(){
-    // calculate the orientation of the accelerometer and convert the output of atan2 from radians to degrees
-    // this data is used to correct any cumulative errors in the orientation that the gyroscope develops.
-    double rollangle=atan2(imu.ay,imu.az)*180/PI;
-    double pitchangle=atan2(imu.ax,sqrt(imu.ay*imu.ay+imu.az*imu.az))*180/PI;
-
-    //THE COMPLEMENTARY FILTER
-    //This filter calculates the angle based MOSTLY on integrating the angular velocity to an angular displacement.
-    //dt is the time between loop() iterations. 
-    //We'll pretend that the angular velocity has remained constant over the time dt, and multiply angular velocity by time to get displacement.
-    //The filter then adds a small correcting factor from the accelerometer ("roll" or "pitch"), so the gyroscope knows which way is down.
-    roll = 0.99 * (roll + imu.gx * (dt / 1000000.0)) + 0.01 * rollangle; // Calculate the angle using a Complimentary filter
-    pitch = 0.99 * (pitch + imu.gy * (dt / 1000000.0)) + 0.01 * pitchangle;
-    yaw=imu.gz;
-
-    Serial.print("roll = ");
-    Serial.print(roll);
-    Serial.print("\t\tpitch = ");
-    Serial.print(pitch);
-    Serial.print("\t\tyaw = ");
-    Serial.println(yaw);
-}
-
 void getHYPR(){
     double heading;
     if (imu.mx == 0)
@@ -237,7 +213,7 @@ void getHYPR(){
     if (heading > 360) heading -= 360;
     else if (heading < 0) heading += 360;
 
-    Serial.print("Heading: "); Serial.println(heading, 2);
+    Serial.print("HYPR: "); Serial.print(heading, 2);
 /*   
     If heading is greater than 337.25 degrees or less than 22.5 degrees – North
     If heading is between 292.5 degrees and 337.25 degrees – North-West
@@ -248,5 +224,22 @@ void getHYPR(){
     If heading is between 67.5 degrees and 112.5 degrees – East
     If heading is between 0 degrees and 67.5 degrees – North-East
  */
+    // calculate the orientation of the accelerometer and convert the output of atan2 from radians to degrees
+    // this data is used to correct any cumulative errors in the orientation that the gyroscope develops.
+    double rollangle=atan2(imu.ay,imu.az)*180/PI;
+    double pitchangle=atan2(imu.ax,sqrt(imu.ay*imu.ay+imu.az*imu.az))*180/PI;
+
+    //THE COMPLEMENTARY FILTER
+    //This filter calculates the angle based MOSTLY on integrating the angular velocity to an angular displacement.
+    //dt is the time between loop() iterations. 
+    //We'll pretend that the angular velocity has remained constant over the time dt, and multiply angular velocity by time to get displacement.
+    //The filter then adds a small correcting factor from the accelerometer ("roll" or "pitch"), so the gyroscope knows which way is down.
+    roll = 0.99 * (roll + imu.gx * (dt / 1000000.0)) + 0.01 * rollangle; // Calculate the angle using a Complimentary filter
+    pitch = 0.99 * (pitch + imu.gy * (dt / 1000000.0)) + 0.01 * pitchangle;
+    yaw=imu.gz;
+
+    Serial.print(",");Serial.print(roll);
+    Serial.print(",");Serial.print(pitch);
+    Serial.print(",");Serial.println(yaw);
 }
 
