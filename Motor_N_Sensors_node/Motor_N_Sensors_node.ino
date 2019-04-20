@@ -152,6 +152,9 @@ void parseInput(){
          */
         getDriveData();
     }
+    else if (cmd == "Driv?"){
+        getDriveData();
+    }
     else if (cmd == "Dist"){
         getDistanceData();
     }
