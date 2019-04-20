@@ -41,7 +41,7 @@ unsigned char sPins[4] = {2, 3, 4, 5};
 const int stepsPerRevolution = 200;
 // declare drivetrain
 Drivetrain* d;
-short rpm = 60;
+short rpm = 1; // rpms are based on <= stepper motor's rated max RPM
 // declare & initialize stepper motor
 Stepper neck(stepsPerRevolution, sPins[0], sPins[1], sPins[2], sPins[3]);
 
@@ -174,6 +174,9 @@ void parseInput(){
             rpm = newRPM;
             neck.setSpeed(rpm);
         }
+        Serial.print("args received: ");
+        Serial.print("RPM=");Serial.print(rpm);
+        Serial.print(" steps=");Serial.println(steps);
         neck.step(steps);
     }
 }
