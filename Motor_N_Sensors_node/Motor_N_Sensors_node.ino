@@ -55,7 +55,7 @@ NewPing sonar[totalDistSensors] = {
 // declare 9DoF chip
 LSM9DS1 imu;
 #define DECLINATION -13.44
-long timer; // a timer to save delta timer for each loop.
+long timer, dt; // a timer to save delta timer for each loop.
 double roll, pitch ,yaw; //These are the angles in the complementary filter
 
 // declare 6DoF chip
@@ -113,20 +113,6 @@ void loop(){
         // mx, my, and mz variables with the most current data.
         imu.readMag();
     }
-
-    // get & print 9DoF sensor data
-    Serial.print("9DoF,");Serial.print(imu.gx);
-    Serial.print(",");Serial.print(imu.gy);
-    Serial.print(",");Serial.print(imu.gz);
-    Serial.print(",");Serial.print(imu.ax);
-    Serial.print(",");Serial.print(imu.ay);
-    Serial.print(",");Serial.print(imu.az);
-    Serial.print(",");Serial.print(imu.mx);
-    Serial.print(",");Serial.print(imu.my);
-    Serial.print(",");Serial.println(imu.mz);
-
-    printAttitude(imu.mx, imu.my, imu.mz);
-    Serial.println();
 /* 
     // get & print 6DoF sensor data
     Serial.print("6DoF");Serial.print(mpu6050.getAccX());
@@ -137,7 +123,66 @@ void loop(){
     Serial.print(",");Serial.println(mpu6050.getGyroZ());
     
  */    
-    // get & print distance sensor data
+    // notice calculation is passed as delta timer ('dt') in microseconds
+    dt = micros() - timer;
+    timer = micros(); // reset timer
+    
+    if (Serial.available() > 2){ //read from buffer if more than 2 bytes
+	    // LF & CR (2 bytes) seem to linger in stream buffer for 1 extra loop() iteration
+	    parseInput();
+	}
+
+}
+
+void parseInput(){
+    // stream expected format  = "# #" where # == [-255,255]
+    // delimiter must be ' ' (1 space)
+    string cmd = Serial.readStringUntil(' ');
+    if (cmd == "Driv"){
+        // use x for left-right steering
+        // use y for forward-backward drive
+        short x = 0;
+        short y = 0;
+        x = Serial.parseInt();
+        y = Serial.parseInt();
+        d->go(x, y);
+        getDriveData();
+    }
+    else if (cmd == "Dist"){
+        getDistanceData();
+    }
+    else if (cmd == "IMU"){
+        getIMUdata();
+    }
+    else if (cmd == "HYPR"){
+        calcPitchYaw();
+        getHYPR();
+    }
+}
+
+void getDriveData(){
+    // get and print drive motor speed (PWM: 0-255)
+    Serial.print("Driv,");
+    Serial.print(d->getSpeed(0));
+    Serial.print(",");
+    Serial.println(d->getSpeed(1));
+}
+
+void getIMUdata(){
+    // get & print 9DoF sensor data
+    Serial.print("9DoF,");Serial.print(imu.gx);
+    Serial.print(",");Serial.print(imu.gy);
+    Serial.print(",");Serial.print(imu.gz);
+    Serial.print(",");Serial.print(imu.ax);
+    Serial.print(",");Serial.print(imu.ay);
+    Serial.print(",");Serial.print(imu.az);
+    Serial.print(",");Serial.print(imu.mx);
+    Serial.print(",");Serial.print(imu.my);
+    Serial.print(",");Serial.println(imu.mz);
+}
+
+void getDistanceData(){
+        // get & print distance sensor data
     Serial.print("Dist");
     for (unsigned char i = 0; i < totalDistSensors; i++){
         Serial.print(",");
@@ -146,43 +191,22 @@ void loop(){
     Serial.println();
     // ensure samples validity by waiting 60ms between readings
     delayMicroseconds(60);
-
-    // get and print drive motor speed (PWM: 0-255)
-    Serial.print("Driv,");
-    Serial.print(d->getSpeed(0));
-    Serial.print(",");
-    Serial.println(d->getSpeed(1));
-    
-    if (Serial.available() > 2){ //read from buffer if more than 2 bytes
-	    // LF & CR (2 bytes) seem to linger in stream buffer for 1 extra loop() iteration
-	    // stream expected format  = "# #" where # == [-255,255]
-	    // delimiter can be any non-digit character (example above uses ' ')
-	    // use x for left-right steering
-        // use y for forward-backward drive
-        short x = Serial.parseInt();
-        short y = Serial.parseInt();
-        d->go(x, y);
-	}
-    
-    // notice calculation is passed as delta timer ('dt') in microseconds
-    calcPitchYaw(imu.ax, imu.ay, imu.az,imu.gx, imu.gy, imu.gz, micros() - timer);
-    timer = micros(); // reset timer
 }
 
-void calcPitchYaw(short ax, short ay, short az, short gx, short gy, short gz, long dt){
+void calcPitchYaw(){
     // calculate the orientation of the accelerometer and convert the output of atan2 from radians to degrees
     // this data is used to correct any cumulative errors in the orientation that the gyroscope develops.
-    double rollangle=atan2(ay,az)*180/PI;
-    double pitchangle=atan2(ax,sqrt(ay*ay+az*az))*180/PI;
+    double rollangle=atan2(imu.ay,imu.az)*180/PI;
+    double pitchangle=atan2(imu.ax,sqrt(imu.ay*imu.ay+imu.az*imu.az))*180/PI;
 
     //THE COMPLEMENTARY FILTER
     //This filter calculates the angle based MOSTLY on integrating the angular velocity to an angular displacement.
     //dt is the time between loop() iterations. 
     //We'll pretend that the angular velocity has remained constant over the time dt, and multiply angular velocity by time to get displacement.
     //The filter then adds a small correcting factor from the accelerometer ("roll" or "pitch"), so the gyroscope knows which way is down.
-    roll = 0.99 * (roll + gx * (dt / 1000000.0)) + 0.01 * rollangle; // Calculate the angle using a Complimentary filter
-    pitch = 0.99 * (pitch + gy * (dt / 1000000.0)) + 0.01 * pitchangle;
-    yaw=gz;
+    roll = 0.99 * (roll + imu.gx * (dt / 1000000.0)) + 0.01 * rollangle; // Calculate the angle using a Complimentary filter
+    pitch = 0.99 * (pitch + imu.gy * (dt / 1000000.0)) + 0.01 * pitchangle;
+    yaw=imu.gz;
 
     Serial.print("roll = ");
     Serial.print(roll);
@@ -192,11 +216,11 @@ void calcPitchYaw(short ax, short ay, short az, short gx, short gy, short gz, lo
     Serial.println(yaw);
 }
 
-void printAttitude(short mx, short my, short mz){
+void getHYPR(){
     double heading;
-    if (mx == 0)
-        heading = my < 0 ? PI / 2 : 0;
-    else heading = atan2(my, mx);
+    if (imu.mx == 0)
+        heading = imu.my < 0 ? PI / 2 : 0;
+    else heading = atan2(imu.my, imu.mx);
 
     // Convert everything from radians to degrees:
     heading *= 180 / PI;

@@ -19,9 +19,9 @@ void BiPed::go(short x, short y){
     }
     else{// if turning left or right adjust motors' speed accordingly
         if (x > 0)
-            right *= (255 - x) / 255.0;
+            right *= ((255 - x) / 255.0);
         else if (x < 0)
-            left *= ((-255 - x) * -1) / 255.0;
+            left *= ((-255 - x) / -255.0);
     }
     // write speed output for each motor
     M1->setSpeed(right);
