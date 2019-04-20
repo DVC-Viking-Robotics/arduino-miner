@@ -1,3 +1,6 @@
+// for parseing datatype String
+#include <String.h>
+
 // include libraries for 9DoF sensor
 #include <LSM9DS1_Registers.h>
 #include <LSM9DS1_Types.h>
@@ -127,7 +130,7 @@ void loop(){
     dt = micros() - timer;
     timer = micros(); // reset timer
     
-    if (Serial.available() > 2){ //read from buffer if more than 2 bytes
+    while (Serial.available()){ //read from buffer if more than 2 bytes
 	    // LF & CR (2 bytes) seem to linger in stream buffer for 1 extra loop() iteration
 	    parseInput();
 	}
@@ -137,7 +140,7 @@ void loop(){
 void parseInput(){
     // stream expected format  = "# #" where # == [-255,255]
     // delimiter must be ' ' (1 space)
-    string cmd = Serial.readStringUntil(' ');
+    String cmd = Serial.readStringUntil(' ');
     if (cmd == "Driv"){
         // use x for left-right steering
         // use y for forward-backward drive
