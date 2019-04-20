@@ -238,8 +238,8 @@ void getHYPR(){
     pitch = 0.99 * (pitch + imu.gy * (dt / 1000000.0)) + 0.01 * pitchangle;
     yaw=imu.gz;
 
-    Serial.print(",");Serial.print(roll);
-    Serial.print(",");Serial.print(pitch);
     Serial.print(",");Serial.println(yaw);
+    Serial.print(",");Serial.print(pitch);
+    Serial.print(",");Serial.print(roll);
 }
 
