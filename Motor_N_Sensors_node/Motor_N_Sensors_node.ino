@@ -116,16 +116,6 @@ void loop(){
         // mx, my, and mz variables with the most current data.
         imu.readMag();
     }
-/* 
-    // get & print 6DoF sensor data
-    Serial.print("6DoF");Serial.print(mpu6050.getAccX());
-    Serial.print(",");Serial.print(mpu6050.getAccY());
-    Serial.print(",");Serial.print(mpu6050.getAccZ());
-    Serial.print(",");Serial.print(mpu6050.getGyroX());
-    Serial.print(",");Serial.print(mpu6050.getGyroY());
-    Serial.print(",");Serial.println(mpu6050.getGyroZ());
-    
- */    
     // notice calculation is passed as delta timer ('dt') in microseconds
     dt = micros() - timer;
     timer = micros(); // reset timer
@@ -175,6 +165,15 @@ void getDriveData(){
 }
 
 void getIMUdata(){
+/* 
+    // get & print 6DoF sensor data
+    Serial.print("6DoF");Serial.print(mpu6050.getAccX());
+    Serial.print(",");Serial.print(mpu6050.getAccY());
+    Serial.print(",");Serial.print(mpu6050.getAccZ());
+    Serial.print(",");Serial.print(mpu6050.getGyroX());
+    Serial.print(",");Serial.print(mpu6050.getGyroY());
+    Serial.print(",");Serial.println(mpu6050.getGyroZ());
+ */    
     // get & print 9DoF sensor data
     Serial.print("9DoF,");Serial.print(imu.gx);
     Serial.print(",");Serial.print(imu.gy);
