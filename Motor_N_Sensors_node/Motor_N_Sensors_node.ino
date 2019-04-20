@@ -13,7 +13,7 @@
 #include <Stepper.h>
 
 // define motor type: 1 to enable direction + PWM or 0 to enable 2 PWM
-#define phased 0
+#define phased 1
 // define drivetrain type: 0 to enable BiPed (R2D2-like), 1 to enable QuadPed (like a race car)
 #define motorConfig 0
 #include "Drivetrain.h"
