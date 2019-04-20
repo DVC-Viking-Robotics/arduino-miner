@@ -41,6 +41,7 @@ unsigned char sPins[4] = {2, 3, 4, 5};
 const int stepsPerRevolution = 200;
 // declare drivetrain
 Drivetrain* d;
+short rpm = 60;
 // declare & initialize stepper motor
 Stepper neck(stepsPerRevolution, sPins[0], sPins[1], sPins[2], sPins[3]);
 
@@ -70,6 +71,7 @@ SFE_UBLOX_GPS myGPS;
 
 void setup(){
 	Serial.begin(115200);// open a channel to pour data into & get commands
+    neck.setSpeed(rpm);
     
     // instantiate drivetrain object (motors' speeds default to 0)
     if (motorConfig)
@@ -128,10 +130,12 @@ void loop(){
 }
 
 void parseInput(){
-    // stream expected format  = "# #" where # == [-255,255]
-    // delimiter must be ' ' (1 space)
+    // stream expected format  = "cmd [args]]"
+    // delimiter must be ' ' (1 space) and cmd must terminate w/ a ' '
+    // read all chars until 1st space into variable cmd of type String
     String cmd = Serial.readStringUntil(' ');
     if (cmd == "Driv"){
+        // args expected format = "x y" where both x & y == [-255,255]
         // use x for left-right steering
         // use y for forward-backward drive
         short x = 0;
@@ -139,10 +143,13 @@ void parseInput(){
         x = Serial.parseInt();
         y = Serial.parseInt();
         d->go(x, y);
+        /* 
+        // for debugging
         Serial.print("received args: ");
         Serial.print(x);
         Serial.print(",");
         Serial.println(y);
+         */
         getDriveData();
     }
     else if (cmd == "Dist"){
@@ -152,7 +159,22 @@ void parseInput(){
         getIMUdata();
     }
     else if (cmd == "HYPR"){
+        // HYPR = Heading Yaw Pitch Roll
         getHYPR();
+    }
+    else if (cmd == "Step"){
+        // args expected format = "steps [rpm]" 
+        // where steps == # of steps to turn stepper 
+        // steps can be negative for reversing direction
+        // rpm is optional and is used to set new speed of rotation
+        // rpm cannot be negative
+        short steps = Serial.parseInt();
+        unsigned short newRPM = Serial.parseInt();
+        if (newRPM != 0){
+            rpm = newRPM;
+            neck.setSpeed(rpm);
+        }
+        neck.step(steps);
     }
 }
 
