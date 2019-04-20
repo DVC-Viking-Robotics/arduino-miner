@@ -174,9 +174,9 @@ void parseInput(){
             rpm = newRPM;
             neck.setSpeed(rpm);
         }
-        Serial.print("args received: ");
-        Serial.print("RPM=");Serial.print(rpm);
-        Serial.print(" steps=");Serial.println(steps);
+        // Serial.print("args received: ");
+        // Serial.print("RPM=");Serial.print(rpm);
+        // Serial.print(" steps=");Serial.println(steps);
         neck.step(steps);
     }
 }
