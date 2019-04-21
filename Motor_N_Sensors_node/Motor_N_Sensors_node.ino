@@ -262,8 +262,8 @@ void getHYPR(){
     //dt is the time between loop() iterations. 
     //We'll pretend that the angular velocity has remained constant over the time dt, and multiply angular velocity by time to get displacement.
     //The filter then adds a small correcting factor from the accelerometer ("roll" or "pitch"), so the gyroscope knows which way is down.
-    roll = 0.99 * (roll + imu.gx * (dt / 1000000.0)) + 0.01 * rollangle; // Calculate the angle using a Complimentary filter
-    pitch = 0.99 * (pitch + imu.gy * (dt / 1000000.0)) + 0.01 * pitchangle;
+    roll = 0.99 * (rollangle + imu.gx * (dt / 1000000.0)) + 0.01 * rollangle; // Calculate the angle using a Complimentary filter
+    pitch = 0.99 * (pitchangle + imu.gy * (dt / 1000000.0)) + 0.01 * pitchangle;
     yaw=imu.gz;
 
     Serial.print(",");Serial.println(yaw);
