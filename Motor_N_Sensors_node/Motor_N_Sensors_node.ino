@@ -2,6 +2,7 @@
 #include <LSM9DS1_Registers.h>
 #include <LSM9DS1_Types.h>
 #include <SparkFunLSM9DS1.h>
+
 // include libraries for 6DoF sensor
 #include <MPU6050_tockn.h>
 #include <Wire.h>
@@ -12,6 +13,10 @@
 // include library for stepper motors
 #include <Stepper.h>
 
+#include <SparkFun_MAG3110.h>
+
+MAG3110 mag = MAG3110(); //Instantiate MAG3110
+
 // define motor type: 1 to enable direction + PWM or 0 to enable 2 PWM
 #define phased 1
 // define drivetrain type: 0 to enable BiPed (R2D2-like), 1 to enable QuadPed (like a race car)
@@ -19,10 +24,10 @@
 #include "Drivetrain.h"
 
 // define PWM control pins for drive motors
-#define M1Forward 	6
-#define M1Backward 	9
-#define M2Forward 	10
-#define M2Backward 	11
+#define M1Forward   6
+#define M1Backward  9
+#define M2Forward   10
+#define M2Backward  11
 // define HC-SR04 pins (echo and trigger are connected to same pin) for NewPing library
 #define sensor1     13
 #define sensor2     12
@@ -48,15 +53,15 @@ NewPing sonar[totalDistSensors] = {
     NewPing(sensor4, sensor4, max_distance)};
 
 // SDO_XM and SDO_G are both pulled high, so our addresses are:
-#define LSM9DS1_M	0x1E // Would be 0x1C if SDO_M is LOW
-#define LSM9DS1_AG	0x6B // Would be 0x6A if SDO_AG is LOW
+#define LSM9DS1_M 0x1E // Would be 0x1C if SDO_M is LOW
+#define LSM9DS1_AG  0x6B // Would be 0x6A if SDO_AG is LOW
 // declare 9DoF chip
 LSM9DS1 imu;
 // declare 6DoF chip
 MPU6050 mpu6050(Wire);
 
 void setup(){
-	Serial.begin(115200);// open a channel to pour data into & get commands
+  Serial.begin(115200);// open a channel to pour data into & get commands
     // instantiate drivetrain object (motors' speeds default to 0)
     if (motorConfig)
         d = new QuadPed(M1Forward, M1Backward, M2Forward, M2Backward, phased);
@@ -87,9 +92,49 @@ void setup(){
     Wire.begin();
     mpu6050.begin();
     mpu6050.calcGyroOffsets(true);// robot should be still during boot up
+
+    mag.initialize(); //Initialize the MAG3110
 }
 
 void loop(){
+
+  int x, y, z;
+
+  if(!mag.isCalibrated()) //If we're not calibrated
+  {
+    if(!mag.isCalibrating()) //And we're not currently calibrating
+    {
+      Serial.println("Entering calibration mode");
+      mag.enterCalMode(); //This sets the output data rate to the highest possible and puts the mag sensor in active mode
+    }
+    else
+    {
+      //Must call every loop while calibrating to collect calibration data
+      //This will automatically exit calibration
+      //You can terminate calibration early by calling mag.exitCalMode();
+      mag.calibrate(); 
+    }
+  }
+  else
+  {
+    Serial.println("Calibrated!");
+  }
+  mag.readMag(&x, &y, &z);
+
+  Serial.print("X: ");
+  Serial.print(x);
+  Serial.print(", Y: ");
+  Serial.print(y);
+  Serial.print(", Z: ");
+  Serial.println(z);
+
+  Serial.print("Heading: ");
+  Serial.println(mag.readHeading());
+
+  Serial.println("--------");
+
+
+  
     // Update the sensor values whenever new data is available
     if ( imu.gyroAvailable() ){
         // To read from the gyroscope,  first call the
@@ -144,14 +189,14 @@ void loop(){
     Serial.println(d->getSpeed(1));
 
     while (Serial.available() > 2){ //read from buffer if more than 2 bytes
-	    // LF & CR (2 bytes) seem to linger in stream buffer for 1 extra loop() iteration
-	    // stream expected format  = "# #" where # == [-100,100]
-	    // delimiter can be any non-digit character (example above uses ' ')
-	    // use x for left-right steering
+      // LF & CR (2 bytes) seem to linger in stream buffer for 1 extra loop() iteration
+      // stream expected format  = "# #" where # == [-100,100]
+      // delimiter can be any non-digit character (example above uses ' ')
+      // use x for left-right steering
         // use y for forward-backward drive
         short x = Serial.parseInt();
         short y = Serial.parseInt();
         d->go(x, y);
-	}
+  }
     delayMicroseconds(60);
 }
