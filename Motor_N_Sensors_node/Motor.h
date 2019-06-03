@@ -4,36 +4,30 @@
 
 class Motor{
 public:
-    Motor(unsigned char pin1, unsigned char pin2){
+    Motor(byte pin1, byte pin2){
         pinMode(pin1, OUTPUT);
         pinMode(pin2, OUTPUT);
     }
-    void setSpeed(short){};
+    void go(short){};
+    void tick(){};
 };
 
 class BiMotor: public Motor{
     // class for instantiating DC drive motor(s)
+    // variables for pin #s
+    byte pOut1, pOut2;
 public:
-    BiMotor(unsigned char, unsigned char);// c'tor
-    void setSpeed(int);// speed can be in range [-255, 255]
-private:
-    void write();// write PWM  to motor pins
-    // variables for PWM duty cyles and pin #s respectively
-    short p1, p2;
-    unsigned char pOut1, pOut2;
+    BiMotor(byte, byte);// c'tor
+    void go(int);// speed can be in range [-255, 255]
 };
 
 class PhasedMotor: public Motor{
     // class for instantiating DC drive motor(s)
+    // variables for pin #s
+    byte dirPin, pwmPin;
 public:
-    PhasedMotor(unsigned char, unsigned char);// c'tor
-    void setSpeed(int);// speed can be in range [-255, 255]
-private:
-    void write();// write PWM  to motor pins
-    // variables for PWM duty cyles and pin #s respectively
-    bool dir;
-    short pwm;
-    unsigned char dirPin, pwmPin;
+    PhasedMotor(byte, byte);// c'tor
+    void go(int);// speed can be in range [-255, 255]
 };
 
 #endif

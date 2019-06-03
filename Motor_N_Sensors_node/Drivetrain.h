@@ -1,36 +1,38 @@
 #ifndef Drivetrain_h
 #define Drivetrain_h
 #include "Motor.h"
+#include "NoDelayStepper.h"
 
 class Drivetrain{
 public:
-    Drivetrain(unsigned char m1pin1, unsigned char m1pin2, unsigned char m2pin1, unsigned char m2pin2, bool isPhased){
+    Drivetrain(unsigned char m1[], unsigned char m2[], unsigned char m3[], bool isPhased){
         //create object for each motor (pinMode performed on instantiation)
         if (isPhased){
-            M1 = new PhasedMotor(m1pin1, m1pin2);
-            M2 = new PhasedMotor(m2pin1, m2pin2);
+            M1 = new PhasedMotor(m1[0], m1[1]);
+            M2 = new PhasedMotor(m2[0], m2[1]);
         }
         else {
-            M1 = new BiMotor(m1pin1, m1pin2);
-            M2 = new BiMotor(m2pin1, m2pin2);
+            M1 = new BiMotor(m1[0], m1[1]);
+            M2 = new BiMotor(m2[0], m2[1]);
         }
+        M3 = new NoDelayStepper(m3);
     }
-    void go(short, short){};
-    short getSpeed(unsigned char){};
+    void tick(){ M3->tick(); };
+    volatile void go(short, short, short){};
 protected:
     short clampPWM(short input){ // return a proper range of [-255, 255]
-        return (input < -255 ? -255: (input > 255 ? 255 : input));
+        return (input < -255 ? -255 : (input > 255 ? 255 : input));
     }
     Motor* M1;
-  	Motor* M2;
+    Motor* M2;
+    NoDelayStepper* M3;
 };
 
 class BiPed: public Drivetrain{
     // class for controlling the DC drive motors in tandem
 public:
-    BiPed(unsigned char, unsigned char, unsigned char, unsigned char, bool);// c'tor
-    void go(short, short);// set motors' speeds allowable range is [-255,255]
-    short getSpeed(unsigned char); //return PWM duty cycle in range [-255, 255]
+    BiPed(unsigned char m1[], unsigned char m2[], unsigned char m3[], bool);// c'tor
+    void go(short, short, short);// set motors' speeds allowable range is [-255,255]
 private:
     short clampPWM(short);// return a proper range of [-255, 255]
     // motor objects and current speeds for left and right motors
@@ -40,9 +42,8 @@ private:
 class QuadPed: public Drivetrain{
     // class for controlling the DC drive motors in tandem
 public:
-    QuadPed(unsigned char, unsigned char, unsigned char, unsigned char, bool);// c'tor
-    void go(short, short);// set motors' speeds allowable range is [-255,255]
-    short getSpeed(unsigned char m = 0); //return PWM duty cycle in range [-255, 255]
+    QuadPed(unsigned char m1[], unsigned char m2[], unsigned char m3[], bool);// c'tor
+    void go(short, short, short);// set motors' speeds allowable range is [-255,255]
 private:
     short clampPWM(short);// return a proper range of [-255, 255]
     // motor objects and current speeds for left and right motors

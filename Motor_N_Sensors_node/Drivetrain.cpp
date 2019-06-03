@@ -1,13 +1,13 @@
 #include "Drivetrain.h"
 
-BiPed::BiPed(unsigned char m1pin1, unsigned char m1pin2, unsigned char m2pin1, unsigned char m2pin2, bool isPhased) :Drivetrain(m1pin1, m1pin2, m2pin1, m2pin2, isPhased){
+BiPed::BiPed(unsigned char m1[], unsigned char m2[], unsigned char m3[], bool isPhased) :Drivetrain(m1, m2, m3, isPhased){
     left = 0;
     right = 0;
-    M1->setSpeed(right);
-    M2->setSpeed(left);
+    M1->go(right);
+    M2->go(left);
 }
 
-void BiPed::go(short x, short y){
+void BiPed::go(short x, short y, short z){
     // make sure x and y are in proper range
     x = clampPWM(x);
     y = clampPWM(y);
@@ -24,33 +24,25 @@ void BiPed::go(short x, short y){
             left *= ((-255 - x) * -1) / 255.0;
     }
     // write speed output for each motor
-    M1->setSpeed(right);
-    M2->setSpeed(left);
+    M1->go(right);
+    M2->go(left);
+    M3->go(z);
 }
 
-short BiPed::getSpeed(unsigned char m){ // let m be the motor #
-    if (m) return right;
-    else return left;
-}
-
-QuadPed::QuadPed(unsigned char m1pin1, unsigned char m1pin2, unsigned char m2pin1, unsigned char m2pin2, bool isPhased) :Drivetrain(m1pin1, m1pin2, m2pin1, m2pin2, isPhased){
+QuadPed::QuadPed(unsigned char m1[], unsigned char m2[], unsigned char m3[], bool isPhased) :Drivetrain(m1, m2, m3, isPhased){
     FB = 0;
     LR = 0;
-    M1->setSpeed(LR);
-    M2->setSpeed(FB);
+    M1->go(LR);
+    M2->go(FB);
 }
 
-void QuadPed::go(short x, short y){
+void QuadPed::go(short x, short y, short z){
     // make sure x and y are in proper range
     x = clampPWM(x);
     y = clampPWM(y);
     FB = y,  LR = x;
     // write speed output for each motor
-    M1->setSpeed(LR);
-    M2->setSpeed(FB);
-}
-
-short QuadPed::getSpeed(unsigned char m){ // let m be the motor #
-    if (m) return LR;
-    else return FB;
+    M1->go(LR);
+    M2->go(FB);
+    M3->go(z);
 }

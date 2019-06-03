@@ -5,3 +5,4 @@
 .vscode/c_cpp_properties.json
 *.bin
 *.ipch
+.vscode/settings.json
