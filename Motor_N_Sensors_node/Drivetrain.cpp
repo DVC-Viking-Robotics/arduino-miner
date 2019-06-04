@@ -27,6 +27,7 @@ void BiPed::go(short x, short y, short z){
     M1->go(right);
     M2->go(left);
     M3->go(z);
+    
 }
 
 QuadPed::QuadPed(unsigned char m1[], unsigned char m2[], unsigned char m3[], bool isPhased) :Drivetrain(m1, m2, m3, isPhased){

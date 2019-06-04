@@ -3,7 +3,7 @@
 
 class NoDelayStepper{
 public:
-    NoDelayStepper(unsigned char pins[], char stepType = 2, long stepsPerRev = 4096, short maxRPM = 60);
+    NoDelayStepper(unsigned char pins[], char stepType = 2, long stepsPerRev = 4096, float degreesPerStep = 0.087890625, short maxRPM = 60);
     float getAngle(); // calc angle
     void go(int); // set target steps
     void go(float); // set target steps via angle
@@ -18,7 +18,8 @@ private:
     bool isCW(); // is ClockWise shorter than counter-ClockWise?
     const unsigned char NumbPins = 4;
     // delta time, Steps Per Revolution, steps counter, steps destination
-    long _dt, SPR, steps, target;
+    unsigned long _dt;
+    long SPR, steps, target;
     char _it, sType;// iterator, stepper type
     short RPM; // Rotations Per Minute
     unsigned char *pin; // array of pins to motor (digital outputs)

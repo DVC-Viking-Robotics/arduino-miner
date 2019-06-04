@@ -1,31 +1,28 @@
 #include "NoDelayStepper.h"
 #include <arduino.h>
 
-NoDelayStepper::NoDelayStepper(unsigned char pins[], char stepType = 2, long stepsPerRev = 4096, short maxRPM = 60){
+NoDelayStepper::NoDelayStepper(unsigned char pins[], char stepType = 2, long stepsPerRev = 4096, float degreesPerStep = 0.087890625, short maxRPM = 60){
     _it = 0;
     steps = 0;
     _dt = 0;
     SPR = stepsPerRev;
-    DPS = stepsPerRev / 360.0;
+    DPS = degreesPerStep;
     RPM = maxRPM;
     target = 0;
     if (stepType == 0 || stepType == 1 || stepType == 2) 
         sType = stepType;
     else sType = -1;
-    // else throw exception
-    if (sizeof(pins) == NumbPins){
-        pin = pins;
-        for (unsigned char i = 0; i < NumbPins; ++i){
-            pinMode(pin[i], OUTPUT);
-            digitalWrite(pin[i], false);
-        }
+    pin = pins;
+    for (unsigned char i = 0; i < NumbPins; ++i){
+        Serial.print("setting up pin ");Serial.println(pin[i]);
+        pinMode(pin[i], OUTPUT);
+        digitalWrite(pin[i], false);
     }
-    // else throw exception
 }
 
 bool NoDelayStepper::isCW(){
     if (abs((target % SPR) - (steps % SPR)) < SPR - abs((target % SPR) - (steps % SPR))){
-        return target < steps;
+        return target <= steps;
     }
     else return target >= steps;
 }
@@ -42,27 +39,35 @@ short NoDelayStepper::step_it(){
 }
 
 void NoDelayStepper::tick(){
-    long delta = millis();
+    unsigned long delta = millis();
     if (target != steps && delta >= _dt){
+        // Serial.print("delta time = ");Serial.println(delta);
         step_it();
         write();
-        if (target != steps)
+        if (target != steps){
             set_delay();
+            // Serial.print("stepper steps = ");Serial.println(steps);
+        }
+/*         else {
+            Serial.print("stepper finished @ ");
+            Serial.print(getAngle());
+            Serial.println(" degrees");
+        }*/
     }
 }
 
 template<typename T>
 T NoDelayStepper::clamp_it(T max, T min = 0, T it = NULL){
     if (it == NULL) it = _it;
-    while (it >= max) _it -= max;
-    while (it < min) _it += max;
+    while (it >= max) it -= max;
+    while (it < min) it += max;
     return it;
 }
 
 void NoDelayStepper::write(){
     short max_it = 0;
     short next = 0;
-    short base = _it / 2;
+    short base = 0;
     switch (sType){
     case 0:
         /*wave NoDelayStepper type*/
@@ -106,7 +111,10 @@ void NoDelayStepper::write(){
 }
 
 void NoDelayStepper::set_delay(){
-    _dt = millis() + (RPM * SPR / 60000.0);
+    _dt = millis() + (long)((long)(RPM) * SPR / 60000.0);
+    /* Serial.print("delay = ");
+    Serial.print((RPM * SPR / 60000.0));
+    Serial.println(" milliseconds."); */
 }
 
 float NoDelayStepper::getAngle(){
@@ -114,8 +122,8 @@ float NoDelayStepper::getAngle(){
 }
 
 void NoDelayStepper::go(int dest){
-    dest = clamp_it<int>(SPR, 0, dest);
-    target = dest;
+    target = clamp_it<long>(SPR, 0, dest);
+    // Serial.print("motor target: ");Serial.println(target);
     if (target != steps){
         write();
         set_delay();
@@ -123,8 +131,7 @@ void NoDelayStepper::go(int dest){
 }
 
 void NoDelayStepper::go(float dest){
-    dest = clamp_it<float>(360.0, 0.0, dest);
-    target = int(dest / 360.0 * SPR);
+    target = (int)(clamp_it<float>(360.0, 0.0, dest) / 360.0 * SPR);
     if (target != steps){
         write();
         set_delay();

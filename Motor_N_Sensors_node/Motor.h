@@ -4,30 +4,29 @@
 
 class Motor{
 public:
-    Motor(byte pin1, byte pin2){
+    Motor(unsigned char pin1, unsigned char pin2){
         pinMode(pin1, OUTPUT);
         pinMode(pin2, OUTPUT);
     }
-    void go(short){};
-    void tick(){};
+    virtual void go(short){};
 };
 
 class BiMotor: public Motor{
     // class for instantiating DC drive motor(s)
     // variables for pin #s
-    byte pOut1, pOut2;
+    unsigned char pOut1, pOut2;
 public:
-    BiMotor(byte, byte);// c'tor
-    void go(int);// speed can be in range [-255, 255]
+    BiMotor(unsigned char, unsigned char);// c'tor
+    void go(short);// speed can be in range [-255, 255]
 };
 
 class PhasedMotor: public Motor{
     // class for instantiating DC drive motor(s)
     // variables for pin #s
-    byte dirPin, pwmPin;
+    unsigned char dirPin, pwmPin;
 public:
-    PhasedMotor(byte, byte);// c'tor
-    void go(int);// speed can be in range [-255, 255]
+    PhasedMotor(unsigned char, unsigned char);// c'tor
+    void go(short);// speed can be in range [-255, 255]
 };
 
 #endif

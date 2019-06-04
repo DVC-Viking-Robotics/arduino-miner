@@ -2,12 +2,12 @@
 #include <arduino.h>
 
 // Function definitions for BiMotor class
-BiMotor::BiMotor(byte pin1, byte pin2): Motor(pin1, pin2){
+BiMotor::BiMotor(unsigned char pin1, unsigned char pin2): Motor(pin1, pin2){
     // save pin #s and set pin mode
     pOut1 = pin1;
     pOut2 = pin2;
 }
-void BiMotor::go(int s){
+void BiMotor::go(short s){
     //input speed 's' must be previously constrained to range of [-255, 255]
     if (s < 0){ // if going backward
         analogWrite(pOut1, 0);
@@ -17,14 +17,15 @@ void BiMotor::go(int s){
         analogWrite(pOut1, s);
         analogWrite(pOut2, 0);
     }
+    // Serial.print("motor pwm: ");Serial.println(s);
 }
 // Function definitions for PhasedMotor class
-PhasedMotor::PhasedMotor(byte pin1, byte pin2): Motor(pin1, pin2){
+PhasedMotor::PhasedMotor(unsigned char pin1, unsigned char pin2): Motor(pin1, pin2){
     // save pin #s and set pin mode
     dirPin = pin1;
     pwmPin = pin2;
 }
-void PhasedMotor::go(int s){
+void PhasedMotor::go(short s){
     //input speed 's' must be previously constrained to range of [-255, 255]
     if (s <= 0){     // if going backward or stopped
         digitalWrite(dirPin, false);
@@ -34,4 +35,5 @@ void PhasedMotor::go(int s){
         digitalWrite(dirPin, true);
         analogWrite(pwmPin, s);
     }
+    // Serial.print("motor pwm: ");Serial.println(s);
 }

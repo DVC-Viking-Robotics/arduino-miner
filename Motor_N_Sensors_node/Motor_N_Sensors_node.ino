@@ -8,7 +8,6 @@ void calibrateMag(); // function prototype
 // define drivetrain type: 0 to enable BiPed (R2D2-like), 1 to enable QuadPed (like a race car)
 #define motorConfig 0
 #include "Drivetrain.h"
-#include "NoDelayStepper.h"
 
 // declare drivetrain
 Drivetrain* d;
@@ -49,9 +48,7 @@ void loop(){
     short y = Serial.parseInt();
     short z = Serial.parseInt();
     d->go(x, y, z);
-    Serial.print("received: ");Serial.print(x);
-    Serial.print(", ");Serial.print(y);
-    Serial.print(", ");Serial.println(z);
+    
   }
 }
 /* 
