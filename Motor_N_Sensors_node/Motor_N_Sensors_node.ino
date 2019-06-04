@@ -22,14 +22,14 @@ byte sPins[4] = {2, 4, 7, 8};
 
 void setup(){
   Serial.begin(115200);// open a channel to pour data into & get commands
-    // instantiate drivetrain object (motors' speeds default to 0)
-    if (motorConfig)
-        d = new QuadPed(M1pins, M2pins, sPins, phased);
-    else d = new BiPed(M1pins, M2pins, sPins, phased);
-    /* 
-    mag.initialize(); //Initialize the MAG3110
-    calibrateMag(); // Calibrate sensor axis
-     */
+  // instantiate drivetrain object (motors' speeds default to 0)
+  if (motorConfig)
+      d = new QuadPed(M1pins, M2pins, sPins, phased);
+  else d = new BiPed(M1pins, M2pins, sPins, phased);
+  /* 
+  mag.initialize(); //Initialize the MAG3110
+  calibrateMag(); // Calibrate sensor axis
+  */
 }
 
 void loop(){
@@ -38,17 +38,20 @@ void loop(){
   /* int mag_x, mag_y, mag_z;
   mag.readMag(&mag_x, &mag_y, &mag_z);
   Serial.println(mag.readHeading());
-   */
+  */
   while (Serial.available() > 2){ //read from buffer if more than 2 bytes
     // LF & CR (2 bytes) seem to linger in stream buffer for 1 extra loop() iteration
     // stream expected format  = "# # #" where # == [-100,100]
     // delimiter can be any non-digit character (example above uses ' ')
     // use x for left-right steering
-      // use y for forward-backward drive
-      short x = Serial.parseInt();
-      short y = Serial.parseInt();
-      short z = Serial.parseInt();
-      d->go(x, y, z);
+    // use y for forward-backward drive
+    short x = Serial.parseInt();
+    short y = Serial.parseInt();
+    short z = Serial.parseInt();
+    d->go(x, y, z);
+    Serial.print("received: ");Serial.print(x);
+    Serial.print(", ");Serial.print(y);
+    Serial.print(", ");Serial.println(z);
   }
 }
 /* 
