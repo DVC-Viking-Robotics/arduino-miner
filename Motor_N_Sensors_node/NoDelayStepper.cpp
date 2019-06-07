@@ -1,7 +1,7 @@
 #include "NoDelayStepper.h"
 #include <arduino.h>
 
-NoDelayStepper::NoDelayStepper(unsigned char pins[], char stepType = 2, long stepsPerRev = 4096, float degreesPerStep = 0.087890625, short maxRPM = 60){
+NoDelayStepper::NoDelayStepper(unsigned char pins[], char stepType, long stepsPerRev, float degreesPerStep, short maxRPM){
     _it = 0;
     steps = 0;
     _dt = 0;
@@ -14,7 +14,7 @@ NoDelayStepper::NoDelayStepper(unsigned char pins[], char stepType = 2, long ste
     else sType = -1;
     pin = pins;
     for (unsigned char i = 0; i < NumbPins; ++i){
-        Serial.print("setting up pin ");Serial.println(pin[i]);
+        // Serial.print("setting up pin ");Serial.println(pin[i]);
         pinMode(pin[i], OUTPUT);
         digitalWrite(pin[i], false);
     }

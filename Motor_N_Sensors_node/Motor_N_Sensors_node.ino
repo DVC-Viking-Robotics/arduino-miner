@@ -4,7 +4,7 @@ MAG3110 mag = MAG3110(); //Instantiate MAG3110
 void calibrateMag(); // function prototype
  */
 // define motor type: 1 to enable direction + PWM or 0 to enable 2 PWM
-#define phased 1
+#define phased 0
 // define drivetrain type: 0 to enable BiPed (R2D2-like), 1 to enable QuadPed (like a race car)
 #define motorConfig 0
 #include "Drivetrain.h"
@@ -44,9 +44,9 @@ void loop(){
     // delimiter can be any non-digit character (example above uses ' ')
     // use x for left-right steering
     // use y for forward-backward drive
-    short x = Serial.parseInt();
-    short y = Serial.parseInt();
-    short z = Serial.parseInt();
+    short x = float(Serial.parseInt()) * 2.55;
+    short y = float(Serial.parseInt()) * 2.55;
+    float z = float(Serial.parseInt() * 3.60);
     d->go(x, y, z);
     
   }

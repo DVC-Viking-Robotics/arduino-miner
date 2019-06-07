@@ -7,10 +7,10 @@ BiPed::BiPed(unsigned char m1[], unsigned char m2[], unsigned char m3[], bool is
     M2->go(left);
 }
 
-void BiPed::go(short x, short y, short z){
+void BiPed::go(short x, short y, float z){
     // make sure x and y are in proper range
-    x = clampPWM(x);
-    y = clampPWM(y);
+    // x = clampPWM(x);
+    // y = clampPWM(y);
     left = y,  right = y;
     // if not going forward or backward (turn on a dime)
     if (y == 0){
@@ -37,10 +37,10 @@ QuadPed::QuadPed(unsigned char m1[], unsigned char m2[], unsigned char m3[], boo
     M2->go(FB);
 }
 
-void QuadPed::go(short x, short y, short z){
+void QuadPed::go(short x, short y, float z){
     // make sure x and y are in proper range
-    x = clampPWM(x);
-    y = clampPWM(y);
+    // x = clampPWM(x);
+    // y = clampPWM(y);
     FB = y,  LR = x;
     // write speed output for each motor
     M1->go(LR);
