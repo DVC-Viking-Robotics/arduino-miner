@@ -9,12 +9,12 @@ public:
     Drivetrain(unsigned char m1[], unsigned char m2[], unsigned char m3[], bool isPhased){
         //create object for each motor (pinMode performed on instantiation)
         if (isPhased){
-            M1 = new PhasedMotor(m1[0], m1[1]);
-            M2 = new PhasedMotor(m2[0], m2[1]);
+            M1 = new PhasedMotor(m1);
+            M2 = new PhasedMotor(m2);
         }
         else {
-            M1 = new BiMotor(m1[0], m1[1]);
-            M2 = new BiMotor(m2[0], m2[1]);
+            M1 = new BiMotor(m1);
+            M2 = new BiMotor(m2);
         }
         M3 = new NoDelayStepper(m3);
     }
@@ -24,8 +24,8 @@ protected:
     /* short clampPWM(short input){ // return a proper range of [-255, 255]
         return (input < -255 ? -255 : (input > 255 ? 255 : input));
     } */
-    Motor* M1;
-    Motor* M2;
+    Solonoid* M1;
+    Solonoid* M2;
     NoDelayStepper* M3;
 };
 
