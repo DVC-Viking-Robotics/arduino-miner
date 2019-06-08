@@ -19,7 +19,7 @@ Solonoid::Solonoid(unsigned char pins[], int dt){
 
 short Solonoid::fakeCellerate(long now){
     long timeI = now - initSmooth;
-    float delta_speed = sin( timeI / (rampTime * 1000) * PI / 2 + ((isUp ? -1 : 1) * PI / 2) ) + isUp;
+    float delta_speed = sin( timeI / (endSmooth - initSmooth) * PI / 2 + ((isUp ? -1 : 1) * PI / 2) ) + isUp;
     write((short)(delta_speed * (targetSpeed - baseSpeed) + baseSpeed));
 }
 
