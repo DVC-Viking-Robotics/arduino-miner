@@ -24,7 +24,7 @@ short Solonoid::fakeCellerate(long now){
     write((short)(delta_speed * (targetSpeed - baseSpeed) + baseSpeed));
 }
 
-void Solonoid::go(short s){
+void Solonoid::cellerate(short s){
     targetSpeed = max(-255, min(255, round(s * 255)));
     initSmooth = micros();
     baseSpeed = getSpeed(); 

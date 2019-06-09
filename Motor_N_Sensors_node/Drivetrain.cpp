@@ -24,8 +24,8 @@ void BiPed::go(short x, short y, float z){
             left *= ((-255 - x) * -1) / 255.0;
     }
     // write speed output for each motor
-    M1->go(right);
-    M2->go(left);
+    M1->cellerate(right);
+    M2->cellerate(left);
     M3->go(z);
     
 }
@@ -43,7 +43,7 @@ void QuadPed::go(short x, short y, float z){
     // y = clampPWM(y);
     FB = y,  LR = x;
     // write speed output for each motor
-    M1->go(LR);
-    M2->go(FB);
+    M1->cellerate(LR);
+    M2->cellerate(FB);
     M3->go(z);
 }

@@ -12,7 +12,8 @@ public:
     Solonoid(unsigned char pins[], int dt = 1000);
     short getSpeed();
     void write(short);
-    void go(short);
+    void cellerate(short);
+    virtual void go(short){};
     void tick();
 protected:
     unsigned char _pin1, _pin2, signal1, signal2;

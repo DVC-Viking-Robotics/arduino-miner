@@ -12,10 +12,10 @@ void calibrateMag(); // function prototype
 // declare drivetrain
 Drivetrain* d;
 // define PWM control pins for drive motors
-byte M1pins[1] = {3};
-byte M2pins[2] = {6, 9};
+byte M1pins[] = {3, 5};
+byte M2pins[] = {6, 9};
 // define controls pins for stepper motor
-byte sPins[4] = {2, 4, 7, 8};
+byte sPins[] = {2, 4, 7, 8};
 // declare & initialize stepper motor
 // NoDelayStepper neck(sPins);
 
