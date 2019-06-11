@@ -11,42 +11,62 @@ Solonoid::Solonoid(unsigned char pins[], int dt){
         _pin2 = pins[1];
     }
     else _pin2 = NULL;
-    signal1 = 0;
-    signal2 = 0;
-    rampTime = dt;
-    isUp= false;
+    signal1 = 0, signal2 = 0, endSpeed = 0, initSpeed = 0;
+    initSmooth = 0, endSmooth = 0, rampTime = dt;
 }
 
-short Solonoid::fakeCellerate(long now){
-    long timeI = now - initSmooth;
-    // float delta_speed = sin( timeI / (endSmooth - initSmooth) * PI / 2 + ((isUp ? -1 : 1) * PI / 2) ) + isUp;
-    float delta_speed = sin( (timeI / (endSmooth - initSmooth) + (isUp ? -1 : 1)) * PI / 2 ) + isUp;
-    write((short)(delta_speed * (targetSpeed - baseSpeed) + baseSpeed));
+short Solonoid::fakeCellerate(unsigned long now){
+    unsigned long timeI = now - initSmooth;
+    // float delta_speed = sin( timeI / (endSmooth - initSmooth) * PI / 2 + ((endSpeed > initSpeed ? -1 : 1) * PI / 2) ) + (endSpeed > initSpeed);
+    float delta_speed = abs(sin( (timeI / (float)(endSmooth - initSmooth) + (endSpeed > initSpeed ? -1 : 1)) * PI / 2 ) + (endSpeed > initSpeed ? 1 : -1));
+    // Serial.print("_ds=sin((");Serial.print(timeI);
+    // Serial.print("/");Serial.print(endSmooth-initSmooth);
+    // Serial.print("+");Serial.print(endSpeed > initSpeed ? -1 : 1);
+    // Serial.print(")*PI/2)+");Serial.println(endSpeed > initSpeed);
+    // Serial.print("pwm = ");Serial.print(delta_speed);
+    // Serial.print(" * (");Serial.print(endSpeed);
+    // Serial.print(" - ");Serial.print(initSpeed);
+    // Serial.print(") + ");Serial.print(initSpeed);
+    // Serial.print(" = ");Serial.println(delta_speed * (endSpeed - initSpeed) + initSpeed);
+    write((short)(delta_speed * (endSpeed - initSpeed) + initSpeed));
 }
 
-void Solonoid::cellerate(short s){
-    targetSpeed = max(-255, min(255, round(s * 255)));
-    initSmooth = micros();
-    baseSpeed = getSpeed(); 
-    float deltaT = abs((targetSpeed - baseSpeed) / 255.0);
-    endSmooth = initSmooth + deltaT * rampTime * 1000;
-    isUp = targetSpeed > baseSpeed;
+void Solonoid::go(short s){
+    endSpeed = max(-255, min(255, round(s)));
+    initSmooth = millis();
+    initSpeed = getSpeed(); 
+    float deltaT = abs((float)(endSpeed - initSpeed) / 255.0);
+    endSmooth = initSmooth + deltaT * rampTime;
+    // endSmooth = initSmooth + rampTime;
+    // Serial.print("init_T=");Serial.print(initSmooth);
+    // Serial.print(" target_T=");Serial.println(endSmooth);
+    // Serial.print("init_s=");Serial.print(initSpeed);
+    // Serial.print(" target_s=");Serial.println(endSpeed);
+    // Serial.print(" going_Fw=");Serial.println(endSpeed > initSpeed);
     fakeCellerate(initSmooth + 1);
 }
+
 short Solonoid::getSpeed(){ 
        return (short)signal1;
 }
-
+ 
 void Solonoid::write(short s){
     // input speed 's' must be previously constrained to range of [-255, 255]
     signal1 = s;
     analogWrite(_pin1, s);
+    // Serial.print(s);
+    // Serial.println(" = Speed wrote with Solonoid Parent class");
 }
 
 void Solonoid::tick(){
-    short currTime = micros();
-    if (abs(getSpeed() - targetSpeed) >= 2  && currTime < endSmooth){
-        fakeCellerate(currTime);
+    if (getSpeed() != endSpeed){
+        unsigned long currTime = millis();
+        if (currTime < endSmooth){
+            fakeCellerate(currTime);
+        }
+        else {
+            write(endSpeed);
+        }
     }
 }
 
@@ -94,6 +114,7 @@ void PhasedMotor::write(short s){
     digitalWrite(_pin1, signal1);
     if (_pin2 != NULL)
         analogWrite(_pin2, signal2);
+    // Serial.print("motor pwm: ");Serial.println(s);
 }
 short PhasedMotor::getSpeed(){ 
     if (_pin2 != NULL){
