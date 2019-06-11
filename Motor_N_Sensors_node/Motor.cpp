@@ -19,10 +19,9 @@ short Solonoid::fakeCellerate(unsigned long now){
     unsigned long timeI = now - initSmooth;
     // float delta_speed = sin( timeI / (endSmooth - initSmooth) * PI / 2 + ((endSpeed > initSpeed ? -1 : 1) * PI / 2) ) + (endSpeed > initSpeed);
     float delta_speed = 1 - cos(timeI / (float)(endSmooth - initSmooth) * PI / 2 );
-    // Serial.print("_ds=sin((");Serial.print(timeI);
+    // Serial.print("_ds=1-cos(");Serial.print(timeI);
     // Serial.print("/");Serial.print(endSmooth-initSmooth);
-    // Serial.print("+");Serial.print(endSpeed > initSpeed ? -1 : 1);
-    // Serial.print(")*PI/2)+");Serial.println(endSpeed > initSpeed);
+    // Serial.println("*PI/2)");
     // Serial.print("pwm = ");Serial.print(delta_speed);
     // Serial.print(" * (");Serial.print(endSpeed);
     // Serial.print(" - ");Serial.print(initSpeed);
@@ -42,7 +41,6 @@ void Solonoid::go(short s){
     // Serial.print(" target_T=");Serial.println(endSmooth);
     // Serial.print("init_s=");Serial.print(initSpeed);
     // Serial.print(" target_s=");Serial.println(endSpeed);
-    // Serial.print(" going_Fw=");Serial.println(endSpeed > initSpeed);
     fakeCellerate(initSmooth + 1);
 }
 
