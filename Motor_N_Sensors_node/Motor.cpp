@@ -18,7 +18,7 @@ Solonoid::Solonoid(unsigned char pins[], int dt){
 short Solonoid::fakeCellerate(unsigned long now){
     unsigned long timeI = now - initSmooth;
     // float delta_speed = sin( timeI / (endSmooth - initSmooth) * PI / 2 + ((endSpeed > initSpeed ? -1 : 1) * PI / 2) ) + (endSpeed > initSpeed);
-    float delta_speed = abs(sin( (timeI / (float)(endSmooth - initSmooth) + (endSpeed > initSpeed ? -1 : 1)) * PI / 2 ) + (endSpeed > initSpeed ? 1 : -1));
+    float delta_speed = 1 - cos(timeI / (float)(endSmooth - initSmooth) * PI / 2 );
     // Serial.print("_ds=sin((");Serial.print(timeI);
     // Serial.print("/");Serial.print(endSmooth-initSmooth);
     // Serial.print("+");Serial.print(endSpeed > initSpeed ? -1 : 1);
