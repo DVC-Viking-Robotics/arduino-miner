@@ -39,20 +39,23 @@ short NoDelayStepper::step_it(){
 }
 
 void NoDelayStepper::tick(){
-    unsigned long delta = millis();
-    if (target != steps && delta >= _dt){
-        // Serial.print("delta time = ");Serial.println(delta);
-        step_it();
-        write();
-        if (target != steps){
-            set_delay();
-            // Serial.print("stepper steps = ");Serial.println(steps);
+    if (target != steps){
+        unsigned long delta = millis();
+        if (delta >= _dt){
+            // Serial.print("delta time = ");Serial.println(delta);
+            step_it();
+            write();
+            if (target != steps){
+                set_delay();
+                // Serial.print("stepper steps = ");
+                // Serial.println(steps);
+            }
+    /*         else {
+                Serial.print("stepper finished @ ");
+                Serial.print(getAngle());
+                Serial.println(" degrees");
+            }*/
         }
-/*         else {
-            Serial.print("stepper finished @ ");
-            Serial.print(getAngle());
-            Serial.println(" degrees");
-        }*/
     }
 }
 
