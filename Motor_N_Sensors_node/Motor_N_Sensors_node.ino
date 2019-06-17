@@ -14,17 +14,13 @@ Drivetrain* d;
 // define PWM control pins for drive motors
 byte M1pins[] = {3, 5};
 byte M2pins[] = {6, 9};
-// define controls pins for stepper motor
-byte sPins[] = {2, 4, 7, 8};
-// declare & initialize stepper motor
-// NoDelayStepper neck(sPins);
 
 void setup(){
   Serial.begin(115200);// open a channel to pour data into & get commands
   // instantiate drivetrain object (motors' speeds default to 0)
   if (motorConfig)
-      d = new QuadPed(M1pins, M2pins, sPins, phased);
-  else d = new BiPed(M1pins, M2pins, sPins, phased);
+      d = new QuadPed(M1pins, M2pins, phased);
+  else d = new BiPed(M1pins, M2pins, phased);
   /* 
   mag.initialize(); //Initialize the MAG3110
   calibrateMag(); // Calibrate sensor axis
@@ -46,8 +42,7 @@ void loop(){
     // use y for forward-backward drive
     short x = round(Serial.parseInt() * 2.55);
     short y = round(Serial.parseInt() * 2.55);
-    double z = Serial.parseInt();
-    d->go(x, y, z);
+    d->go(x, y);
     
   }
 }

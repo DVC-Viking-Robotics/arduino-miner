@@ -1,12 +1,11 @@
 #ifndef Drivetrain_h
 #define Drivetrain_h
 #include "Motor.h"
-#include "NoDelayStepper.h"
 #include <arduino.h>
 
 class Drivetrain{
 public:
-    Drivetrain(unsigned char m1[], unsigned char m2[], unsigned char m3[], bool isPhased){
+    Drivetrain(unsigned char m1[], unsigned char m2[], bool isPhased){
         //create object for each motor (pinMode performed on instantiation)
         if (isPhased){
             M1 = new PhasedMotor(m1);
@@ -16,9 +15,8 @@ public:
             M1 = new BiMotor(m1);
             M2 = new BiMotor(m2);
         }
-        M3 = new NoDelayStepper(m3);
     }
-    virtual void go(short, short, double){};// dummy prototype
+    virtual void go(short, short){};// dummy prototype
     void tick();
 protected:
     /* short clampPWM(short input){ // return a proper range of [-255, 255]
@@ -26,14 +24,13 @@ protected:
     } */
     Solonoid* M1;
     Solonoid* M2;
-    NoDelayStepper* M3;
 };
 
 class BiPed: public Drivetrain{
     // class for controlling the DC drive motors in tandem
 public:
-    BiPed(unsigned char m1[], unsigned char m2[], unsigned char m3[], bool);// c'tor
-    void go(short, short, double);// set motors' speeds allowable range is [-255,255]
+    BiPed(unsigned char m1[], unsigned char m2[], bool);// c'tor
+    void go(short, short);// set motors' speeds allowable range is [-255,255]
 private:
     // motor objects and current speeds for left and right motors
     short right, left;
@@ -42,8 +39,8 @@ private:
 class QuadPed: public Drivetrain{
     // class for controlling the DC drive motors in tandem
 public:
-    QuadPed(unsigned char m1[], unsigned char m2[], unsigned char m3[], bool);// c'tor
-    void go(short, short, double);// set motors' speeds allowable range is [-255,255]
+    QuadPed(unsigned char m1[], unsigned char m2[], bool);// c'tor
+    void go(short, short);// set motors' speeds allowable range is [-255,255]
 private:
     // motor objects and current speeds for left and right motors
     short FB, LR;
