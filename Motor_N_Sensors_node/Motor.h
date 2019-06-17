@@ -11,8 +11,9 @@ public:
     Solonoid(unsigned char pins[], int dt = 100);
     virtual void write(short);
     virtual short getSpeed();
-    void go(short);
+    void go(short s, long dt = NULL);
     void tick();
+    bool isChanging();
 protected:
     unsigned char _pin1, _pin2, signal1, signal2;
 };

@@ -1,10 +1,15 @@
 #include "Drivetrain.h"
+void Drivetrain::tick(){
+    M1->tick(); 
+    M2->tick(); 
+    M3->tick(); 
+}
 
 BiPed::BiPed(unsigned char m1[], unsigned char m2[], unsigned char m3[], bool isPhased) :Drivetrain(m1, m2, m3, isPhased){
     left = 0;
     right = 0;
-    M1->go(right);
-    M2->go(left);
+    // M1->go(right);
+    // M2->go(left);
 }
 
 void BiPed::go(short x, short y, float z){
@@ -33,8 +38,8 @@ void BiPed::go(short x, short y, float z){
 QuadPed::QuadPed(unsigned char m1[], unsigned char m2[], unsigned char m3[], bool isPhased) :Drivetrain(m1, m2, m3, isPhased){
     FB = 0;
     LR = 0;
-    M1->go(LR);
-    M2->go(FB);
+    // M1->go(LR);
+    // M2->go(FB);
 }
 
 void QuadPed::go(short x, short y, float z){
@@ -43,7 +48,7 @@ void QuadPed::go(short x, short y, float z){
     // y = clampPWM(y);
     FB = y,  LR = x;
     // write speed output for each motor
-    M1->go(LR);
+    M1->go(LR, 0);
     M2->go(FB);
     M3->go(z);
 }

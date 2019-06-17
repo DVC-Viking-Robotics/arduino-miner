@@ -19,7 +19,7 @@ public:
         M3 = new NoDelayStepper(m3);
     }
     virtual void go(short, short, float){};// dummy prototype
-    void tick(){ M1->tick(); M2->tick(); M3->tick(); };
+    void tick();
 protected:
     /* short clampPWM(short input){ // return a proper range of [-255, 255]
         return (input < -255 ? -255 : (input > 255 ? 255 : input));

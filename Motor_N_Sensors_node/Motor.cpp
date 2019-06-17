@@ -15,33 +15,51 @@ Solonoid::Solonoid(unsigned char pins[], int dt){
     initSmooth = 0, endSmooth = 0, rampTime = dt;
 }
 
-short Solonoid::fakeCellerate(unsigned long now){
-    unsigned long timeI = now - initSmooth;
-    // float delta_speed = sin( timeI / (endSmooth - initSmooth) * PI / 2 + ((endSpeed > initSpeed ? -1 : 1) * PI / 2) ) + (endSpeed > initSpeed);
-    float delta_speed = (1 - cos(timeI / (float)(endSmooth - initSmooth) * PI)) / 2;
-    // Serial.print("_ds=1-cos(");Serial.print(timeI);
-    // Serial.print("/");Serial.print(endSmooth-initSmooth);
-    // Serial.println("*PI/2)");
-    // Serial.print("pwm = ");Serial.print(delta_speed);
-    // Serial.print(" * (");Serial.print(endSpeed);
-    // Serial.print(" - ");Serial.print(initSpeed);
-    // Serial.print(") + ");Serial.print(initSpeed);
-    // Serial.print(" = ");Serial.println(delta_speed * (endSpeed - initSpeed) + initSpeed);
-    write((short)(delta_speed * (endSpeed - initSpeed) + initSpeed));
+bool Solonoid::isChanging(){
+    return millis() < endSmooth;
 }
 
-void Solonoid::go(short s){
-    endSpeed = max(-255, min(255, round(s)));
-    initSmooth = millis();
-    initSpeed = getSpeed(); 
-    float deltaT = abs((float)(endSpeed - initSpeed) / 510.0);
-    endSmooth = initSmooth + deltaT * rampTime;
-    // endSmooth = initSmooth + rampTime;
-    // Serial.print("init_T=");Serial.print(initSmooth);
-    // Serial.print(" target_T=");Serial.println(endSmooth);
-    // Serial.print("init_s=");Serial.print(initSpeed);
-    // Serial.print(" target_s=");Serial.println(endSpeed);
-    fakeCellerate(initSmooth + 1);
+short Solonoid::fakeCellerate(unsigned long now = NULL){
+    if (now == NULL)
+        now = millis() - initSmooth;
+    if (endSmooth == initSmooth || now > (endSmooth - initSmooth)){
+        write(endSpeed);
+    }
+    else{
+        double ds = (1 - cos(now / (double)(endSmooth - initSmooth) * PI)) / 2;
+        // Serial.print("_ds=1-cos(");Serial.print(now);
+        // Serial.print("/");Serial.print(endSmooth-initSmooth);
+        // Serial.println("*PI/2)");
+        // Serial.print("pwm = ");Serial.print(ds);
+        // Serial.print(" * (");Serial.print(endSpeed);
+        // Serial.print(" - ");Serial.print(initSpeed);
+        // Serial.print(") + ");Serial.print(initSpeed);
+        // Serial.print(" = ");Serial.println(ds * (endSpeed - initSpeed) + initSpeed);
+        write((short)(ds * (endSpeed - initSpeed) + initSpeed));
+    }
+}
+
+void Solonoid::go(short s, long dt){
+    s = max(-255, min(255, (int)s));
+    if (s != endSpeed){
+        endSpeed = s;
+        if (dt == NULL) dt = rampTime;
+        if (dt > 0){
+            initSmooth = millis();
+            initSpeed = getSpeed(); 
+            double of_dt = abs((double)(255 + endSpeed - (255 + initSpeed)) / 510.0);
+            endSmooth = initSmooth + of_dt * dt;
+            // endSmooth = initSmooth + dt;
+            // Serial.print("init_T=");Serial.print(initSmooth);
+            // Serial.print(" target_T=");Serial.println(endSmooth);
+            // Serial.print("init_s=");Serial.print(initSpeed);
+            // Serial.print(" target_s=");Serial.println(endSpeed);
+            fakeCellerate(0);
+        }
+        else{
+            write(endSpeed);
+        }    
+    }
 }
 
 short Solonoid::getSpeed(){ 
@@ -58,8 +76,8 @@ void Solonoid::write(short s){
 
 void Solonoid::tick(){
     if (getSpeed() != endSpeed){
-        unsigned long currTime = millis();
-        if (currTime < endSmooth){
+        unsigned long currTime = millis() - initSmooth;
+        if (currTime < (initSmooth - endSmooth)){
             fakeCellerate(currTime);
         }
         else {
