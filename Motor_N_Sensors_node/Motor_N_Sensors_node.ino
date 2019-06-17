@@ -44,9 +44,9 @@ void loop(){
     // delimiter can be any non-digit character (example above uses ' ')
     // use x for left-right steering
     // use y for forward-backward drive
-    short x = float(Serial.parseInt()) * 2.55;
-    short y = float(Serial.parseInt()) * 2.55;
-    float z = float(Serial.parseInt() * 3.60);
+    short x = round(Serial.parseInt() * 2.55);
+    short y = round(Serial.parseInt() * 2.55);
+    double z = Serial.parseInt();
     d->go(x, y, z);
     
   }

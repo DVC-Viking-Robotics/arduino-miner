@@ -146,6 +146,7 @@ void NoDelayStepper::releasePins(){
         digitalWrite(pin[i], false);
 }
 
+// use to map angular values of [-180.0,180.0] to percentual values of [-100.0,100.0]
 void NoDelayStepper::go(double dest){ // % value
     if (dest == NULL){
         resetZeroAngle();
@@ -159,6 +160,8 @@ void NoDelayStepper::go(double dest){ // % value
     }
 }
 
+// meant for telling stepper to turn CW | CCW
+// input 'dest' is int of steps to take (or until 0 is passed for 'dest')
 void NoDelayStepper::goSteps(int dest){
     if (dest == NULL){
         resetZeroAngle();
@@ -171,6 +174,7 @@ void NoDelayStepper::goSteps(int dest){
     }
 }
 
+// expects angle between -180 & 180, but will wrap input to [0,360]
 void NoDelayStepper::goAngle(double dest){
     if (dest == NULL){
         resetZeroAngle();

@@ -12,7 +12,7 @@ BiPed::BiPed(unsigned char m1[], unsigned char m2[], unsigned char m3[], bool is
     // M2->go(left);
 }
 
-void BiPed::go(short x, short y, float z){
+void BiPed::go(short x, short y, double z){
     // make sure x and y are in proper range
     // x = clampPWM(x);
     // y = clampPWM(y);
@@ -42,7 +42,7 @@ QuadPed::QuadPed(unsigned char m1[], unsigned char m2[], unsigned char m3[], boo
     // M2->go(FB);
 }
 
-void QuadPed::go(short x, short y, float z){
+void QuadPed::go(short x, short y, double z){
     // make sure x and y are in proper range
     // x = clampPWM(x);
     // y = clampPWM(y);

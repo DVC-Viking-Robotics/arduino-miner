@@ -18,7 +18,7 @@ public:
         }
         M3 = new NoDelayStepper(m3);
     }
-    virtual void go(short, short, float){};// dummy prototype
+    virtual void go(short, short, double){};// dummy prototype
     void tick();
 protected:
     /* short clampPWM(short input){ // return a proper range of [-255, 255]
@@ -33,7 +33,7 @@ class BiPed: public Drivetrain{
     // class for controlling the DC drive motors in tandem
 public:
     BiPed(unsigned char m1[], unsigned char m2[], unsigned char m3[], bool);// c'tor
-    void go(short, short, float);// set motors' speeds allowable range is [-255,255]
+    void go(short, short, double);// set motors' speeds allowable range is [-255,255]
 private:
     // motor objects and current speeds for left and right motors
     short right, left;
@@ -43,7 +43,7 @@ class QuadPed: public Drivetrain{
     // class for controlling the DC drive motors in tandem
 public:
     QuadPed(unsigned char m1[], unsigned char m2[], unsigned char m3[], bool);// c'tor
-    void go(short, short, float);// set motors' speeds allowable range is [-255,255]
+    void go(short, short, double);// set motors' speeds allowable range is [-255,255]
 private:
     // motor objects and current speeds for left and right motors
     short FB, LR;
